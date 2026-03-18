@@ -189,6 +189,55 @@ button, [onclick], input, textarea, select { cursor: url("data:image/svg+xml,%3C
 
 /* ══ MARCA DE AGUA ══ */
 body::after { content:'\01F4D6'; position:fixed; bottom:-5px; left:50%; transform:translateX(-50%); font-size:38vw; opacity:0.013; pointer-events:none; z-index:0; filter:sepia(1) brightness(0.3); user-select:none; }
+
+/* ══ POPUP CÓDIGO ══ */
+#popupCodigo {
+  position: fixed; inset: 0; background: rgba(5,2,1,0.92);
+  z-index: 400; display: none; align-items: center; justify-content: center;
+  padding: 2rem;
+}
+#popupCodigo.visible { display: flex; }
+.popup-inner {
+  background: radial-gradient(145deg, #2e1a10, #140a04);
+  border: 1px solid var(--oro);
+  padding: 2.5rem 2rem; max-width: 420px; width: 100%;
+  position: relative; text-align: center;
+}
+.popup-inner::before {
+  content: ''; position: absolute; inset: 6px;
+  border: 1px dashed rgba(201,160,89,0.25); pointer-events: none;
+}
+.popup-titulo {
+  font-family: 'Cinzel', serif; font-size: 1.1rem; letter-spacing: 0.2em;
+  color: var(--oro-oscuro); margin-bottom: 0.5rem;
+}
+.popup-subtitulo {
+  font-family: 'IM Fell English', serif; font-style: italic;
+  color: var(--pergamino-oscuro); font-size: 0.95rem; margin-bottom: 1.8rem; line-height: 1.6;
+}
+.popup-codigo-display {
+  font-family: 'Cinzel', serif; font-size: 2.8rem; font-weight: 900;
+  color: var(--oro-suave); letter-spacing: 0.4em;
+  text-shadow: 0 0 20px rgba(201,160,89,0.4), 0 2px 4px rgba(0,0,0,0.8);
+  margin-bottom: 1.5rem; display: block;
+}
+.popup-acciones { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+.btn-popup-copiar {
+  font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.12em;
+  background: var(--oro); border: 1px solid var(--oro); color: var(--tinta);
+  padding: 0.6rem 1.5rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-popup-copiar:hover { background: var(--oro-suave); }
+.btn-popup-cerrar {
+  font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.12em;
+  background: transparent; border: 1px solid var(--oro-oscuro); color: var(--oro-oscuro);
+  padding: 0.6rem 1.5rem; cursor: pointer; transition: all 0.2s;
+}
+.btn-popup-cerrar:hover { border-color: var(--oro); color: var(--oro); }
+.popup-aviso {
+  font-family: 'IM Fell English', serif; font-style: italic;
+  font-size: 0.78rem; color: rgba(139,103,48,0.5); margin-top: 1.2rem;
+}
 </style>
 </head>
 <body>
@@ -318,18 +367,7 @@ body::after { content:'\01F4D6'; position:fixed; bottom:-5px; left:50%; transfor
   </div>
   <div class="repositorio" id="repositorio"></div>
 
-  <div id="miCodigoSection" style="display:none;margin-top:2rem">
-    <div class="seccion-cabecera">
-      <div class="seccion-numero" style="font-size:1.8rem">⚿</div>
-      <h2 class="seccion-titulo">Tu Código de Invitación</h2>
-      <div class="seccion-linea"></div>
-    </div>
-    <div class="mi-codigo-box">
-      <span class="mi-codigo-label">Comparte con quien quieras invitar al club:</span>
-      <span class="mi-codigo-valor" id="miCodigoValor">——</span>
-      <button class="btn-copiar" onclick="copiarCodigo()">Copiar</button>
-    </div>
-  </div>
+
 
   <div class="anadir-libro" style="margin-top:2rem">
     <p class="anadir-titulo">✦ AÑADIR AL ARCHIVO ✦</p>
@@ -628,16 +666,24 @@ document.getElementById('emojiSelector').addEventListener('click', e => {
 
 // ── Código de invitación ──────────────────────
 window.mostrarMiCodigo = () => {
-  const s = document.getElementById('miCodigoSection');
-  s.style.display = 'block';
-  document.getElementById('miCodigoValor').textContent = socioActual.codigoPropio;
-  s.scrollIntoView({ behavior:'smooth', block:'center' });
+  document.getElementById('popupCodigoValor').textContent = socioActual.codigoPropio;
+  document.getElementById('popupAvisoCopiado').textContent = '';
+  document.getElementById('popupCodigo').classList.add('visible');
 };
-window.copiarCodigo = () => {
-  navigator.clipboard.writeText(socioActual.codigoPropio);
-  const btn = document.querySelector('.btn-copiar');
-  btn.textContent = '✓ Copiado'; setTimeout(() => { btn.textContent = 'Copiar'; }, 2200);
+window.cerrarPopupCodigo = () => {
+  document.getElementById('popupCodigo').classList.remove('visible');
 };
+window.copiarCodigoPopup = () => {
+  navigator.clipboard.writeText(socioActual.codigoPropio).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = socioActual.codigoPropio;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  });
+  const aviso = document.getElementById('popupAvisoCopiado');
+  aviso.textContent = '✓ ¡Código copiado al portapapeles!';
+  setTimeout(() => { aviso.textContent = ''; }, 3000);
+};
+window.copiarCodigo = window.copiarCodigoPopup;
 
 // ── Maestro de Lectura ────────────────────────
 window.verificarMaestro = async () => {
@@ -824,5 +870,20 @@ function initReveal() {
 applyVol();
 init();
 </script>
+
+<!-- POPUP CÓDIGO DE INVITACIÓN -->
+<div id="popupCodigo" onclick="if(event.target===this)cerrarPopupCodigo()">
+  <div class="popup-inner">
+    <div class="popup-titulo">✦ TU CÓDIGO DE INVITACIÓN ✦</div>
+    <p class="popup-subtitulo">Comparte este código con quien quieras invitar al club.<br>Es de un solo uso — úsalo con quien lo merezca.</p>
+    <span class="popup-codigo-display" id="popupCodigoValor">——</span>
+    <div class="popup-acciones">
+      <button class="btn-popup-copiar" onclick="copiarCodigoPopup()">📋 Copiar código</button>
+      <button class="btn-popup-cerrar" onclick="cerrarPopupCodigo()">Cerrar</button>
+    </div>
+    <div class="popup-aviso" id="popupAvisoCopiado"></div>
+    <p class="popup-aviso">El nuevo socio lo usará al registrarse junto a su apodo lector</p>
+  </div>
+</div>
 </body>
 </html>
