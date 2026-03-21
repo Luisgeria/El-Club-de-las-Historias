@@ -289,6 +289,11 @@ body::after { content:'\01F4D6'; position:fixed; bottom:-5px; left:50%; transfor
 .btn-del-msg { position:absolute; top:0.6rem; right:0.8rem; background:transparent; border:none; color:rgba(139,32,32,0.4); font-size:0.75rem; cursor:pointer; font-family:'Cinzel',serif; padding:0.2rem 0.4rem; transition:color 0.2s; display:none; }
 .foro-msg:hover .btn-del-msg { display:block; }
 .btn-del-msg:hover { color:#e05050; }
+.foro-reciente-label {
+  font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.15em;
+  color:rgba(139,103,48,0.35); text-align:right; margin-bottom:0.5rem;
+  padding-right:0.2rem;
+}
 .foro-vacio { font-family:'IM Fell English',serif; font-style:italic; color:rgba(139,103,48,0.35); text-align:center; padding:2rem 0; font-size:1.1rem; }
 .foro-cargando { text-align:center; padding:1.5rem; color:var(--oro-oscuro); font-family:'Cinzel',serif; font-size:0.8rem; letter-spacing:0.1em; }
 
@@ -992,7 +997,7 @@ async function cargarPanelMaestro() {
   var librosAll = librosSnap.docs.map(function(d) { return Object.assign({ id:d.id }, d.data()); });
   var lecturas  = lecturasSnap.docs.map(function(d) { return d.data(); });
   var foroMsgs  = foroSnap.docs.map(function(d) { return Object.assign({ id:d.id }, d.data()); })
-    .sort(function(a,b) { return (a.timestamp?a.timestamp.seconds:0) - (b.timestamp?b.timestamp.seconds:0); });
+    .sort(function(a,b) { return (b.timestamp?b.timestamp.seconds:0) - (a.timestamp?a.timestamp.seconds:0); });
 
   document.getElementById('statsGrid').innerHTML =
     '<div class="stat-card"><div class="stat-num">' + socios.length + '</div><div class="stat-label">Socios del club</div></div>' +
@@ -1102,7 +1107,7 @@ async function cargarForo() {
   try {
     var snap = await getDocs(collection(db, 'club_foro'));
     foroMsgsCache = snap.docs.map(function(d) { return Object.assign({ id:d.id }, d.data()); })
-      .sort(function(a,b) { return (a.timestamp?a.timestamp.seconds:0) - (b.timestamp?b.timestamp.seconds:0); });
+      .sort(function(a,b) { return (b.timestamp?b.timestamp.seconds:0) - (a.timestamp?a.timestamp.seconds:0); });
     renderForo();
   } catch(e) {
     el.innerHTML = '<div class="foro-cargando">Error cargando el salón</div>';
@@ -1117,7 +1122,7 @@ function renderForo() {
     el.innerHTML = '<div class="foro-vacio">El gran salón está en silencio… sé el primero en escribir.</div>';
     return;
   }
-  el.innerHTML = foroMsgsCache.map(function(msg) {
+  el.innerHTML = '<div class="foro-reciente-label">↑ más reciente</div>' + foroMsgsCache.map(function(msg) {
     var esPropio = socioActual && msg.apodo === socioActual.apodo;
     var esMaestro = !!window._maestroActivo;
     var fecha = msg.timestamp ? new Date(msg.timestamp.seconds*1000).toLocaleDateString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
