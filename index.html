@@ -564,26 +564,26 @@ body::after { content:'\01F4D6'; position:fixed; bottom:-5px; left:50%; transfor
     <div class="seccion-linea"></div>
   </div>
   <div class="foro-container">
-    <div class="foro-creditos-bar" id="foroCredBar">
+    <div class="foro-mensajes" id="foroMensajes">
+      <div class="foro-cargando">Cargando el salón…</div>
+    </div>
+    <div class="foro-creditos-bar" id="foroCredBar" style="margin-top:1rem">
       <span class="creditos-label">✦ MENSAJES DISPONIBLES</span>
       <span class="creditos-valor" id="foroCredValor">—</span>
       <span class="creditos-label" style="opacity:0.5">· máx. 20 · cada libro aprobado suma 5</span>
     </div>
-    <div id="foroFormWrapper">
+    <div id="foroFormWrapper" style="margin-top:0.5rem">
       <div class="foro-mensaje-form">
         <textarea class="foro-input" id="foroInput" placeholder="Escribe algo al club… una recomendación, una duda, lo que sientas después de leer…" maxlength="500"></textarea>
         <button class="btn-foro-enviar btn-acc" data-action="enviarmsg">✦ Enviar<br>mensaje</button>
       </div>
     </div>
-    <div id="foroBloqueadoWrapper" style="display:none">
+    <div id="foroBloqueadoWrapper" style="display:none;margin-top:1rem">
       <div class="foro-bloqueado">
         <div class="foro-bloqueado-icon">📜</div>
         <div class="foro-bloqueado-txt" id="foroBloqueadoTxt">Para escribir en el salón necesitas haber sellado al menos un libro.</div>
         <div class="foro-bloqueado-sub">El Maestro de Lectura debe aprobar tus libros para activar tus mensajes.</div>
       </div>
-    </div>
-    <div class="foro-mensajes" id="foroMensajes">
-      <div class="foro-cargando">Cargando el salón…</div>
     </div>
   </div>
 
